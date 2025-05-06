@@ -1,102 +1,167 @@
 import streamlit as st
 import re
-import pyperclip
-import unicodedata
 
-# CONFIGURAÇÕES DA PÁGINA
-st.set_page_config(page_title="Pix Organiza", layout="centered")
-
-# CSS
-st.markdown("""
-    <style>
-    html, body {
-        background-color: #F4F6FB;
-        font-family: 'Segoe UI', sans-serif;
-    }
-    .stTextArea textarea {
-        background-color: #F9FAFB !important;
-        border: 1px solid #ccc;
-        border-radius: 20px;
-        padding: 12px;
-        font-size: 15px;
-    }
-    .stButton>button {
-        padding: 10px 20px;
-        border-radius: 24px;
-        font-weight: 600;
-        border: none;
-    }
-    .card {
-        background-color: white;
-        border-radius: 20px;
-        padding: 20px;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.07);
-        margin-bottom: 20px;
-    }
-    footer {visibility: hidden;}
-    </style>
-""", unsafe_allow_html=True)
-
-# LISTA DE BANCOS (resumida para exemplo — inclua todos se quiser)
+# LISTA DE BANCOS
 bancos = [
-    "Banco do Brasil", "BB", "Bradesco", "Itaú", "Itau", "Santander", "Nubank", "Caixa", "CEF",
-    "Banco Inter", "Banco Original", "Banco Safra", "Banco Pan", "C6 Bank", "Neon", "PagBank",
-    "Mercado Pago", "BTG", "XP", "Modal", "Daycoval", "BMG", "Sofisa", "Votorantim", "ABC",
-    "Pine", "Topázio", "BS2", "Stone", "Sicoob", "Sicredi", "Banrisul", "Banestes", "BRB",
-    "HSBC", "Citibank", "J.P. Morgan", "Rabobank", "Western Union", "Creditas", "Master",
-    "Indusval", "BBM", "Banese", "PIX", "Pix"
+    # Banco do Brasil
+    "Banco do Brasil", "BB", "Banco Brasil", "Bco do Brasil", "Bco Brasil", "Brasil",
+
+    # Bradesco
+    "Bradesco", "Banco Bradesco", "Bradesco S.A.", "Bradesco SA", "Bco Bradesco",
+
+    # Itaú / Itau
+    "Itaú", "Itau", "Banco Itaú", "Banco Itau", "Itau Unibanco", "Itaú Unibanco", "Banco Itau SA", "Itau SA",
+
+    # Santander
+    "Santander", "Banco Santander", "Santander Brasil", "Santander S.A.", "Santander SA", "Bco Santander",
+
+    # Caixa Econômica
+    "Caixa", "CEF", "Caixa Econômica", "Caixa Economica", "Caixa Federal", "Caixa Econômica Federal", "Caixa Econ Federal", "Caixa Econ.", "Cx Econômica", "Cxa", "Cxa Econômica",
+
+    # Nubank
+    "Nubank", "NuBank", "Nu Pagamentos", "Nu Pagto", "Banco Nubank", "Nu",
+
+    # Inter
+    "Inter", "Banco Inter", "Intermedium", "Banco Intermedium", "Inter SA", "Banco Inter SA",
+
+    # Original
+    "Banco Original", "Original", "Original SA",
+
+    # Safra
+    "Banco Safra", "Safra", "Safra SA",
+
+    # Pan
+    "Banco Pan", "Banco PAN", "Pan", "Banco PAN SA", "Panamericano", "Banco Panamericano",
+
+    # C6
+    "C6", "C6 Bank", "Banco C6", "C6 SA",
+
+    # Neon
+    "Neon", "Banco Neon", "Neon Pagamentos",
+
+    # PagBank / PagSeguro
+    "PagBank", "Pagseguro", "PagSeguro", "Banco Pagseguro", "Banco PagBank", "Pagseg", "Pag",
+
+    # Mercado Pago
+    "Mercado Pago", "MercadoLivre", "ML", "MPago", "Mercado",
+
+    # BTG
+    "BTG", "BTG Pactual", "Banco BTG", "BTG SA",
+
+    # XP
+    "XP", "XP Investimentos", "Banco XP", "XP SA",
+
+    # Modal
+    "Modal", "Banco Modal", "ModalMais", "Modal Mais",
+
+    # Daycoval
+    "Daycoval", "Banco Daycoval", "Daycoval SA",
+
+    # BMG
+    "BMG", "Banco BMG", "BMG SA",
+
+    # Sofisa
+    "Sofisa", "Banco Sofisa", "Sofisa Direto", "Banco Sofisa Direto",
+
+    # Votorantim
+    "Votorantim", "Banco Votorantim", "BV", "BV Financeira", "Banco BV",
+
+    # ABC Brasil
+    "ABC", "Banco ABC Brasil", "ABC Brasil", "Banco ABC",
+
+    # Pine
+    "Pine", "Banco Pine",
+
+    # Topázio
+    "Topázio", "Topazio", "Banco Topázio", "Banco Topazio", "Topázio Bank", "Topazio Bank",
+
+    # BS2
+    "BS2", "Banco BS2", "Banco Bonsucesso", "Bonsucesso",
+
+    # Stone
+    "Stone", "Stone Pagamentos", "Banco Stone",
+
+    # Sicoob
+    "Sicoob", "Banco Sicoob", "Sistema Sicoob", "Sicoob Cred", "Sicoob SA",
+
+    # Sicredi
+    "Sicredi", "Banco Sicredi", "Sistema Sicredi", "Sicredi SA",
+
+    # Banrisul
+    "Banrisul", "Banco Banrisul", "Banco do Estado do RS", "Banrisul SA",
+
+    # Banestes
+    "Banestes", "Banco Banestes",
+
+    # BRB
+    "BRB", "Banco BRB", "Banco de Brasília", "BRB SA",
+
+    # HSBC
+    "HSBC", "Banco HSBC",
+
+    # Citibank
+    "Citibank", "Citi", "Banco Citi", "Banco Citibank", "Citi SA",
+
+    # JP Morgan
+    "JP Morgan", "J.P. Morgan", "Banco JP Morgan", "Banco J.P. Morgan",
+
+    # Rabobank
+    "Rabobank", "Banco Rabobank",
+
+    # Western Union
+    "Western Union", "WU", "Banco Western Union",
+
+    # Creditas
+    "Creditas", "Banco Creditas",
+
+    # Master
+    "Master", "Banco Master",
+
+    # Indusval
+    "Indusval", "Banco Indusval",
+
+    # BBM
+    "BBM", "Banco BBM",
+
+    # Banese
+    "Banese", "Banco Banese",
+
+    # PIX / Outros
+    "PIX", "Pix", "Chave Pix", "Transferência Pix", "Transferencia Pix", "Pix Transferência",
+
+    # XP
+    'XP', 'xp', 'XP (348)', 'Xp', 'Xp (348)', 
+
+     # PicPay
+    "Picpay", "PicPay", "Banco Picpay", "PicPay S.A.",
 ]
 
-# TÍTULO
-st.markdown("### <span style='color:#007BFF'>Organizador de Pix</span>", unsafe_allow_html=True)
-
-# ENTRADA
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.markdown("**💡 Cole os dados das transações abaixo:**")
-texto_digitado = st.text_area("Digite os dados", label_visibility="collapsed", height=160)
-st.markdown("</div>", unsafe_allow_html=True)
-
-# TRATAR DADOS
-def tratar_dados(texto):
+# Função para tratar os dados
+def tratar_dados(entrada):
     padrao = re.compile(
-        r"(?P<nome>[A-Za-zÀ-ÖØ-öø-ÿ0-9&\s.\-]+?)\s+PIX\s+"
+        rf"(?P<banco>{'|'.join(re.escape(b) for b in bancos)})\s+"  
+        r"(?P<nome>[A-Za-zÀ-ÖØ-öø-ÿ0-9&\s.\-]+?)\s+PIX\s+"  
         r"(?:(?:CPF|CNPJ)\s*(?P<chave>[\d. /-]+)|"
-        r"Email\s*(?P<email>[\w.\-]+@[a-zA-Z0-9.\-]+)|"
-        r"Fone\s*(?P<fone>\+?[0-9\s()\-]+))\s*"
-        r"(?:AG\s*(?P<agencia>[0-9\-A-Za-z]+))?\s*"
-        r"(?:C[\/\s]?(?:C|POUP|CC|CNPJ|C/POUP)?\s*(?P<conta>[\w.\-]+))?\s*"
-        r"R\$\s*(?P<valor>\d{1,3}(?:[.,]?\d{3})*[.,]\d{2})",
+        r"Email\s*(?P<email>[\w.\-]+@[a-zA-Z0-9.\-]+)|"  
+        r"Fone\s*(?P<fone>\+?[0-9\s()\-]+))\s*"  
+        r"(?:AG\s*(?P<agencia>[0-9\-A-Za-z]+))?\s*"  
+        r"(?:C[\/\s]?(?:C|POUP|C/C|CC|CPOUP|CNPJ|C/POUP)?\s*(?P<conta>[\w.\-]+))?\s*"  
+        r"R\$\s*(?P<valor>\d{1,3}(?:[.,]?\d{3})*[.,]\d{2})",  
         flags=re.IGNORECASE
     )
 
-    linhas = texto.splitlines()
     resultados = []
     total_valor = 0.0
     total_contas = 0
 
-    for linha in linhas:
-        if not linha.strip():
-            continue
-
-        match = padrao.search(linha)
-        if not match:
-            continue
-
+    for match in padrao.finditer(entrada):
         dados = match.groupdict()
-
-        # Detectar banco pela linha completa
-        banco_detectado = "Não identificado"
-        for banco_ref in bancos:
-            if re.search(rf"\b{re.escape(banco_ref)}\b", linha, re.IGNORECASE):
-                banco_detectado = banco_ref
-                break
-
-        nome = dados.get('nome', '').strip()
+        banco = dados['banco'].strip() if dados.get('banco') else 'Não informado'
+        nome = dados['nome'].strip() if dados.get('nome') else 'Não informado'
         agencia = dados.get('agencia') or '-'
         conta = dados.get('conta') or '-'
         chave_pix = dados.get('chave') or dados.get('email') or dados.get('fone') or 'Não informado'
 
-        # Tratamento da chave
         if re.fullmatch(r"[\d.\-/ ()]+", chave_pix):
             chave_numerica = re.sub(r"[^\d]", "", chave_pix)
             if len(chave_numerica) == 14:
@@ -116,7 +181,7 @@ def tratar_dados(texto):
             valor_formatado = '0,00'
 
         resultado = (
-            f"Banco: {banco_detectado}\n"
+            f"Banco: {banco}\n"
             f"Nome: {nome}\n"
             f"Chave Pix: {chave_pix.strip()}\n"
             f"Agência: {agencia}\n"
@@ -129,38 +194,51 @@ def tratar_dados(texto):
             resultados.append(resultado)
             total_contas += 1
 
-    total_formatado = f"R$ {total_valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+    valor_total_formatado = f"R$ {total_valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
 
-    return "\n".join(resultados) + f"\nTotal de transações: {total_contas}\nTotal em valor: {total_formatado}\n" if resultados else "⚠️ Nenhuma transação válida encontrada."
+    if resultados:
+        resultado_final = "\n".join(resultados)
+        resultado_final += f"Total de transações: {total_contas}\nTotal em valor: {valor_total_formatado}\n"
+        return resultado_final
+    else:
+        return "Nenhuma transação válida encontrada."
 
-# BOTÕES
+# Interface Streamlit
+st.set_page_config(page_title="Pix Organiza", layout="centered")
+
+st.title("📄 Organizador de Pix")
+st.markdown("---")
+
+with st.expander("✏️ Digite os dados das transações"):
+    entrada = st.text_area("Insira os dados brutos", height=300)
+
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    if st.button("✅ Tratar os Dados"):
-        if texto_digitado.strip():
-            st.session_state["resultado"] = tratar_dados(texto_digitado)
+    tratar = st.button("✅ Tratar Dados")
 
 with col2:
-    if st.button("🗑️ Limpar Dados"):
-        st.session_state["resultado"] = ""
-        st.rerun()
+    limpar = st.button("🧹 Limpar Campos")
 
 with col3:
-    if st.button("📋 Copiar Dados"):
-        if "resultado" in st.session_state:
-            pyperclip.copy(st.session_state["resultado"])
-            st.success("✅ Resultado copiado!")
+    copiar = st.button("📋 Copiar Resultado")
 
-# RESULTADO
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.markdown("**📤 Resultado Formatado**")
-st.text_area("Resultado", value=st.session_state.get("resultado", ""), height=300, label_visibility="collapsed", disabled=True)
-st.markdown("</div>", unsafe_allow_html=True)
+if "resultado" not in st.session_state:
+    st.session_state.resultado = ""
 
-# RODAPÉ
-st.markdown("""
-<div style='text-align: center; font-size: 12px; color: #888; padding-top: 10px;'>
-    ⚙️ Feito por <a href='https://www.instagram.com/guuh_black?igsh=aDR2cG9rdGtweTV6' target='_blank' style='color:#007BFF;text-decoration:none;'>@gustavo.python</a> • Powered by Python • © 2025
-</div>
-""", unsafe_allow_html=True)
+if tratar and entrada:
+    st.session_state.resultado = tratar_dados(entrada)
+
+if limpar:
+    entrada = ""
+    st.session_state.resultado = ""
+
+if copiar and st.session_state.resultado:
+    st.code("Resultado copiado com sucesso!")  # apenas feedback visual
+
+st.markdown("---")
+st.subheader("📌 Dados Tratados")
+st.text_area("Resultado", st.session_state.resultado, height=400)
+
+st.markdown("---")
+st.markdown("<center><sub>🛠 Feito por @gustavo.python • ⚙ Powered by Python • © 2025</sub></center>", unsafe_allow_html=True)
