@@ -103,12 +103,12 @@ def tratar_dados(entrada):
             valor_formatado = '0,00'
 
         resultado = (
-            f"Banco: {banco}\n"
-            f"Nome: {nome}\n"
-            f"Chave Pix: {chave_pix.strip()}\n"
-            f"Agência: {agencia}\n"
-            f"Conta: {conta}\n"
-            f"Valor: R$ {valor_formatado}\n"
+            f"🏦 Banco: {banco}\n"
+            f"👤 Nome: {nome}\n"
+            f"🔑 Chave Pix: {chave_pix.strip()}\n"
+            f"🏢 Agência: {agencia}\n"
+            f"💳 Conta: {conta}\n"
+            f"💰 Valor: R$ {valor_formatado}\n"
             f"{'─'*20}\n"
         )
 
