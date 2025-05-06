@@ -20,7 +20,7 @@ bancos = [
     "Caixa", "CEF", "Caixa Econômica", "Caixa Economica", "Caixa Federal", "Caixa Econômica Federal", "Caixa Econ Federal", "Caixa Econ.", "Cx Econômica", "Cxa", "Cxa Econômica",
     "Nubank", "NuBank", "Nu Pagamentos", "Nu Pagto", "Banco Nubank", "Nu", "Nunbank",
     "Inter", "Banco Inter", "Intermedium", "Banco Intermedium", "Inter SA", "Banco Inter SA",
-    "Banco Original", "Original", "Original SA",
+    "Banco Original", "Original", "Original SA", "Ogiginal",
     "Banco Safra", "Safra", "Safra SA", "SA Safra",
     "Banco Pan", "Banco PAN", "Pan", "Banco PAN SA", "Panamericano", "Banco Panamericano",
     "C6", "C6 Bank", "Banco C6", "C6 SA",
