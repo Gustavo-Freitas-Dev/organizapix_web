@@ -109,7 +109,7 @@ def tratar_dados(entrada):
             f"Agência: {agencia}\n"
             f"Conta: {conta}\n"
             f"Valor: R$ {valor_formatado}\n"
-            f"{'─'*40}\n"
+            f"{'─'*20}\n"
         )
 
         if resultado not in resultados:
