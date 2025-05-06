@@ -21,7 +21,7 @@ bancos = [
     "Nubank", "NuBank", "Nu Pagamentos", "Nu Pagto", "Banco Nubank", "Nu",
     "Inter", "Banco Inter", "Intermedium", "Banco Intermedium", "Inter SA", "Banco Inter SA",
     "Banco Original", "Original", "Original SA",
-    "Banco Safra", "Safra", "Safra SA",
+    "Banco Safra", "Safra", "Safra SA", "SA Safra",
     "Banco Pan", "Banco PAN", "Pan", "Banco PAN SA", "Panamericano", "Banco Panamericano",
     "C6", "C6 Bank", "Banco C6", "C6 SA",
     "Neon", "Banco Neon", "Neon Pagamentos",
