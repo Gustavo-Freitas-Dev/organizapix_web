@@ -18,7 +18,7 @@ bancos = [
     "Itaú", "Itau", "Banco Itaú", "Banco Itau", "Itau Unibanco", "Itaú Unibanco", "Banco Itau SA", "Itau SA",
     "Santander", "Banco Santander", "Santander Brasil", "Santander S.A.", "Santander SA", "Bco Santander",
     "Caixa", "CEF", "Caixa Econômica", "Caixa Economica", "Caixa Federal", "Caixa Econômica Federal", "Caixa Econ Federal", "Caixa Econ.", "Cx Econômica", "Cxa", "Cxa Econômica",
-    "Nubank", "NuBank", "Nu Pagamentos", "Nu Pagto", "Banco Nubank", "Nu",
+    "Nubank", "NuBank", "Nu Pagamentos", "Nu Pagto", "Banco Nubank", "Nu", "Nunbank",
     "Inter", "Banco Inter", "Intermedium", "Banco Intermedium", "Inter SA", "Banco Inter SA",
     "Banco Original", "Original", "Original SA",
     "Banco Safra", "Safra", "Safra SA", "SA Safra",
