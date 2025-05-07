@@ -2,6 +2,10 @@ import streamlit as st
 import re
 import unicodedata
 
+# 🖥 Interface Streamlit
+st.set_page_config(page_title="Pix Organiza", layout="centered")
+
+
 # 🔧 Função para limpar a entrada
 def limpar_entrada(texto):
     texto = unicodedata.normalize('NFKC', texto)  # normaliza acentos e símbolos invisíveis
@@ -125,14 +129,17 @@ def tratar_dados(entrada):
     else:
         return "Nenhuma transação válida encontrada."
 
-# 🖥 Interface Streamlit
-st.set_page_config(page_title="Pix Organiza", layout="centered")
 
 st.title("📄 Organizador de Pix")
 st.markdown("---")
 
+# Resetar o valor ANTES do widget
+if "limpar" in st.session_state and st.session_state["limpar"]:
+    st.session_state["entrada"] = ""
+    st.session_state["limpar"] = False
+
 with st.expander("✏️ Digite os dados das transações"):
-    entrada = st.text_area("Insira os dados brutos", height=300)
+    entrada = st.text_area("Insira os dados brutos", height=300, key='entrada')
 
 col1, col2, col3 = st.columns(3)
 
@@ -153,8 +160,10 @@ if tratar and entrada:
     st.session_state.resultado = tratar_dados(entrada)
 
 if limpar:
-    entrada = ""
     st.session_state.resultado = ""
+    st.session_state["limpar"] = True
+    st.rerun() # Reinicia a execução para aplicar o reset
+
 
 if copiar and st.session_state.resultado:
     st.code("Resultado copiado com sucesso!")  # Apenas feedback visual
