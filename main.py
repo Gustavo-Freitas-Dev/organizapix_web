@@ -164,13 +164,18 @@ if limpar:
     st.session_state["limpar"] = True
     st.rerun() # Reinicia a execução para aplicar o reset
 
-
 if copiar and st.session_state.resultado:
-    st.code("Resultado copiado com sucesso!")  # Apenas feedback visual
+    st.download_button(
+        label="⬇️ Baixar Resultado",
+        data=st.session_state.resultado,
+        file_name="resultado_pix.txt",
+        mime="text/plain"
+    )
 
 st.markdown("---")
 st.subheader("📌 Dados Tratados")
-st.text_area("Resultado", st.session_state.resultado, height=400)
+st.text_area("Resultado", st.session_state.resultado, height=400, key="resultado_area")
+
 
 st.markdown("---")
 st.markdown("<center><sub>🛠 Feito por @gustavo.python • ⚙ Powered by Python • © 2025</sub></center>", unsafe_allow_html=True)
