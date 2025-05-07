@@ -32,7 +32,7 @@ bancos = [
     "Sicredi", "Banco Sicredi",
     "Banrisul", "Banco Banrisul",
     "BRB", "Banco BRB",
-    "PIX", "Pix", "Chave Pix", "Transferência Pix", "Pix Transferência",
+    "PIX", "Pix", "Chave Pix", "Transferência Pix", "Pix Transferência", "C6 (336)"
 ]
 
 def tratar_dados(entrada):
