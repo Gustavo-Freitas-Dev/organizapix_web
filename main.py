@@ -1,68 +1,40 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import re
 import unicodedata
+import html
 
-# 🖥 Interface Streamlit
 st.set_page_config(page_title="Pix Organiza", layout="centered")
 
-
-# 🔧 Função para limpar a entrada
 def limpar_entrada(texto):
-    texto = unicodedata.normalize('NFKC', texto)  # normaliza acentos e símbolos invisíveis
-    texto = re.sub(r'\*+', ' ', texto)  # substitui asteriscos (negrito do WhatsApp) por espaço
-    texto = texto.replace('\r', '\n')  # uniformiza quebras de linha
-    texto = re.sub(r'[ \t]+', ' ', texto)  # remove espaços/tabs duplicados
-    texto = re.sub(r'\n{2,}', '\n', texto)  # remove linhas em branco duplicadas
+    texto = unicodedata.normalize('NFKC', texto)
+    texto = re.sub(r'\*+', ' ', texto)
+    texto = texto.replace('\r', '\n')
+    texto = re.sub(r'[ \t]+', ' ', texto)
+    texto = re.sub(r'\n{2,}', '\n', texto)
     return texto.strip()
 
-# 🏦 Lista de bancos
 bancos = [
     "Banco do Brasil", "BB", "Banco Brasil", "Bco do Brasil", "Bco Brasil", "Brasil",
     "Bradesco", "Banco Bradesco", "Bradesco S.A.", "Bradesco SA", "Bco Bradesco",
     "Itaú", "Itau", "Banco Itaú", "Banco Itau", "Itau Unibanco", "Itaú Unibanco", "Banco Itau SA", "Itau SA",
     "Santander", "Banco Santander", "Santander Brasil", "Santander S.A.", "Santander SA", "Bco Santander",
-    "Caixa", "CEF", "Caixa Econômica", "Caixa Economica", "Caixa Federal", "Caixa Econômica Federal", "Caixa Econ Federal", "Caixa Econ.", "Cx Econômica", "Cxa", "Cxa Econômica",
-    "Nubank", "NuBank", "Nu Pagamentos", "Nu Pagto", "Banco Nubank", "Nu", "Nunbank",
-    "Inter", "Banco Inter", "Intermedium", "Banco Intermedium", "Inter SA", "Banco Inter SA",
-    "Banco Original", "Original", "Original SA", "Ogiginal",
-    "Banco Safra", "Safra", "Safra SA", "SA Safra",
-    "Banco Pan", "Banco PAN", "Pan", "Banco PAN SA", "Panamericano", "Banco Panamericano",
-    "C6", "C6 Bank", "Banco C6", "C6 SA",
-    "Neon", "Banco Neon", "Neon Pagamentos",
-    "PagBank", "Pagseguro", "PagSeguro", "Banco Pagseguro", "Banco PagBank", "Pagseg", "Pag",
+    "Caixa", "CEF", "Caixa Econômica", "Caixa Economica", "Caixa Federal", "Caixa Econômica Federal",
+    "Nubank", "NuBank", "Nu Pagamentos", "Banco Nubank", "Nu", "Nunbank",
+    "Inter", "Banco Inter", "Intermedium", "Banco Intermedium",
+    "Original", "Banco Original", "Original SA",
+    "PagBank", "Pagseguro", "PagSeguro", "Banco Pagseguro", "Banco PagBank",
     "Mercado Pago", "MercadoLivre", "ML", "MPago", "Mercado",
-    "BTG", "BTG Pactual", "Banco BTG", "BTG SA",
-    "XP", "XP Investimentos", "Banco XP", "XP SA", "xp", "XP (348)", "Xp", "Xp (348)",
-    "Modal", "Banco Modal", "ModalMais", "Modal Mais",
-    "Daycoval", "Banco Daycoval", "Daycoval SA",
-    "BMG", "Banco BMG", "BMG SA",
-    "Sofisa", "Banco Sofisa", "Sofisa Direto", "Banco Sofisa Direto",
-    "Votorantim", "Banco Votorantim", "BV", "BV Financeira", "Banco BV",
-    "ABC", "Banco ABC Brasil", "ABC Brasil", "Banco ABC",
-    "Pine", "Banco Pine",
-    "Topázio", "Topazio", "Banco Topázio", "Banco Topazio", "Topázio Bank", "Topazio Bank",
-    "BS2", "Banco BS2", "Banco Bonsucesso", "Bonsucesso",
-    "Stone", "Stone Pagamentos", "Banco Stone",
-    "Sicoob", "Banco Sicoob", "Sistema Sicoob", "Sicoob Cred", "Sicoob SA",
-    "Sicredi", "Banco Sicredi", "Sistema Sicredi", "Sicredi SA",
-    "Banrisul", "Banco Banrisul", "Banco do Estado do RS", "Banrisul SA",
-    "Banestes", "Banco Banestes",
-    "BRB", "Banco BRB", "Banco de Brasília", "BRB SA",
-    "HSBC", "Banco HSBC",
-    "Citibank", "Citi", "Banco Citi", "Banco Citibank", "Citi SA",
-    "JP Morgan", "J.P. Morgan", "Banco JP Morgan", "Banco J.P. Morgan",
-    "Rabobank", "Banco Rabobank",
-    "Western Union", "WU", "Banco Western Union",
-    "Creditas", "Banco Creditas",
-    "Master", "Banco Master",
-    "Indusval", "Banco Indusval",
-    "BBM", "Banco BBM",
-    "Banese", "Banco Banese",
-    "PIX", "Pix", "Chave Pix", "Transferência Pix", "Transferencia Pix", "Pix Transferência",
-    "Picpay", "PicPay", "Banco Picpay", "PicPay S.A.",
+    "BTG", "BTG Pactual", "Banco BTG",
+    "XP", "XP Investimentos", "Banco XP", "XP (348)",
+    "Picpay", "PicPay", "Banco Picpay",
+    "Sicoob", "Banco Sicoob",
+    "Sicredi", "Banco Sicredi",
+    "Banrisul", "Banco Banrisul",
+    "BRB", "Banco BRB",
+    "PIX", "Pix", "Chave Pix", "Transferência Pix", "Pix Transferência",
 ]
 
-# ⚙️ Função principal de tratamento dos dados
 def tratar_dados(entrada):
     padrao = re.compile(
         rf"(?P<banco>{'|'.join(re.escape(b) for b in bancos)})\s+"
@@ -130,30 +102,28 @@ def tratar_dados(entrada):
         return "Nenhuma transação válida encontrada."
 
 
+# Interface
 st.title("📄 Organizador de Pix")
 st.markdown("---")
 
-# Resetar o valor ANTES do widget
+if "resultado" not in st.session_state:
+    st.session_state.resultado = ""
+
 if "limpar" in st.session_state and st.session_state["limpar"]:
     st.session_state["entrada"] = ""
     st.session_state["limpar"] = False
 
 with st.expander("✏️ Digite os dados das transações"):
-    entrada = st.text_area("Insira os dados brutos", height=300, key='entrada')
+    entrada = st.text_area("Insira os dados brutos", height=300, key="entrada")
 
-col1, col2, col3 = st.columns(3)
+# Botões centralizados com espaço proporcional
+col1, col2, _ = st.columns([1, 1, 2])
 
 with col1:
-    tratar = st.button("✅ Tratar Dados")
+    tratar = st.button("✅ Tratar Dados", use_container_width=True)
 
 with col2:
-    limpar = st.button("🧹 Limpar Campos")
-
-with col3:
-    copiar = st.button("📋 Copiar Resultado")
-
-if "resultado" not in st.session_state:
-    st.session_state.resultado = ""
+    limpar = st.button("🧹 Limpar Campos", use_container_width=True)
 
 if tratar and entrada:
     entrada = limpar_entrada(entrada)
@@ -162,20 +132,37 @@ if tratar and entrada:
 if limpar:
     st.session_state.resultado = ""
     st.session_state["limpar"] = True
-    st.rerun() # Reinicia a execução para aplicar o reset
-
-if copiar and st.session_state.resultado:
-    st.download_button(
-        label="⬇️ Baixar Resultado",
-        data=st.session_state.resultado,
-        file_name="resultado_pix.txt",
-        mime="text/plain"
-    )
+    st.rerun()
 
 st.markdown("---")
 st.subheader("📌 Dados Tratados")
-st.text_area("Resultado", st.session_state.resultado, height=400, key="resultado_area")
 
+if st.session_state.resultado:
+    resultado_html = html.escape(st.session_state.resultado).replace("\n", "<br>").replace(" ", "&nbsp;")
+    components.html(f"""
+        <div style="
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            padding: 16px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        " onclick="copiarResultado()" title="Clique para copiar">
+            {resultado_html}
+        </div>
+        <script>
+        function copiarResultado() {{
+            navigator.clipboard.writeText(`{st.session_state.resultado.replace("`", "\\`")}`)
+                .then(() => {{
+                    alert("✅ Resultado copiado com sucesso!");
+                }})
+                .catch(err => {{
+                    alert("❌ Erro ao copiar: " + err);
+                }});
+        }}
+        </script>
+    """, height=400)
 
 st.markdown("---")
 st.markdown("<center><sub>🛠 Feito por @gustavo.python • ⚙ Powered by Python • © 2025</sub></center>", unsafe_allow_html=True)
