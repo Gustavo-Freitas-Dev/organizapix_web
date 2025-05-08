@@ -140,7 +140,7 @@ if limpar:
     st.session_state["limpar"] = True
     st.rerun()
 
-st.markdown("---")
+st.markdown("----")
 st.subheader("📌 Dados Tratados")
 
 if st.session_state.resultado:
