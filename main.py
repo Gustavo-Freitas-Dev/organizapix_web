@@ -37,7 +37,7 @@ bancos = [
 
 def tratar_dados(entrada):
     padrao = re.compile(
-        rf"(?P<banco>{'|'.join(re.escape(b) for b in bancos)})\s+"
+        r"(?P<banco>[A-Za-zÀ-ÖØ-öø-ÿ0-9&\s.\-]*?)\s*"
         r"(?P<nome>[A-Za-zÀ-ÖØ-öø-ÿ0-9&\s.\-]+?)\s+PIX\s+"
         r"(?:(?:CPF|CNPJ)\s*(?P<chave>[\d. /-]+)|"
         r"Email\s*(?P<email>[\w.\-]+@[a-zA-Z0-9.\-]+)|"
@@ -54,8 +54,18 @@ def tratar_dados(entrada):
 
     for match in padrao.finditer(entrada):
         dados = match.groupdict()
+        nome_completo = dados['nome'].strip()
         banco = dados['banco'].strip()
-        nome = dados['nome'].strip()
+
+        # Corrigir banco dentro do nome
+        if not any(b.lower() in banco.lower() for b in bancos):
+            for b in bancos:
+                if nome_completo.lower().startswith(b.lower()):
+                    banco = b
+                    nome_completo = nome_completo[len(b):].strip()
+                    break
+
+        nome = nome_completo
         agencia = dados.get('agencia') or '-'
         conta = dados.get('conta') or '-'
         chave_pix = dados.get('chave') or dados.get('email') or dados.get('fone') or 'Não informado'
@@ -101,7 +111,6 @@ def tratar_dados(entrada):
     else:
         return "Nenhuma transação válida encontrada."
 
-
 # Interface
 st.title("📄 Organizador de Pix")
 st.markdown("---")
@@ -116,12 +125,9 @@ if "limpar" in st.session_state and st.session_state["limpar"]:
 with st.expander("✏️ Digite os dados das transações"):
     entrada = st.text_area("Insira os dados brutos", height=300, key="entrada")
 
-# Botões centralizados com espaço proporcional
 col1, col2, _ = st.columns([1, 1, 2])
-
 with col1:
     tratar = st.button("✅ Tratar Dados", use_container_width=True)
-
 with col2:
     limpar = st.button("🧹 Limpar Campos", use_container_width=True)
 
@@ -138,6 +144,7 @@ st.markdown("---")
 st.subheader("📌 Dados Tratados")
 
 if st.session_state.resultado:
+    js_safe = st.session_state.resultado.replace("\\", "\\\\").replace("`", "\\`")
     resultado_html = html.escape(st.session_state.resultado).replace("\n", "<br>").replace(" ", "&nbsp;")
     components.html(f"""
         <div style="
@@ -153,7 +160,7 @@ if st.session_state.resultado:
         </div>
         <script>
         function copiarResultado() {{
-            navigator.clipboard.writeText(`{st.session_state.resultado.replace("`", "\\`")}`)
+            navigator.clipboard.writeText(`{js_safe}`)
                 .then(() => {{
                     alert("✅ Resultado copiado com sucesso!");
                 }})
