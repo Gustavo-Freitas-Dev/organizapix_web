@@ -6,7 +6,6 @@ Aplicação prática em Python com [Streamlit](https://streamlit.io) para organi
 
 - Extração automática de:
   - Razão social
-  - 
   - Nome do banco (com variações populares)
   - Chave Pix (CPF, CNPJ, e-mail ou telefone)
   - Agência e conta (quando informadas)
